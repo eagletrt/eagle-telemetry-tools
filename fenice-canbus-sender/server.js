@@ -46,17 +46,17 @@ function updateCANData(message) {
             // console.log('--->')
             // console.log(firstByte)
             if (firstByte == 0x01) {
-                console.log('--->throttle')
+                // console.log('--->throttle')
                 canData.throttle.push(data[1]);
             } else if (firstByte == 0x02 && countBRK < 10) {
                 canData.brake.push(data[1]);
-                console.log('--->brake')
+                // console.log('--->brake')
             }
             break;
         case (0xC0):
             // console.log('--->imu')
             if (firstByte == 0x03) {
-                Console.log('---gyro-x-y')
+                // console.log('---gyro-x-y')
                 canData.imu_gyro.push({
                     x: (data[2] === 1 ? -(data[0] * 256 + data[1]) : (data[0] * 256 + data[1])),
                     y: (data[5] === 1 ? -(data[3] * 256 + data[4]) : (data[3] * 256 + data[4])),
