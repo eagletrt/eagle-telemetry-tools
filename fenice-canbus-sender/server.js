@@ -8,7 +8,7 @@ const topic = config.mqtt.topic[0];
 const hostname = config.mqtt.hostname;
 const port = config.mqtt.port;
 const mqttUri = 'mqtt://' + hostname + ':' + port;
-const MILLIS = 5000;
+const MILLIS = 500;
 
 const channel = can.createRawChannel("can0", true);
 
