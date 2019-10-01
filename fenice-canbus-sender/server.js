@@ -1,17 +1,17 @@
-var mqtt = require('mqtt');
-var config = require('./config/config.json');
+const mqtt = require('mqtt');
+const config = require('./config/config.json');
 const os = require('os');
 
-var can = require('socketcan');
+const can = require('socketcan');
 
-var topic = config.mqtt.topic[0];
-var hostname = config.mqtt.hostname;
-var port = config.mqtt.port;
-var mqttUri = 'mqtt://' + hostname + ':' + port;
+const topic = config.mqtt.topic[0];
+const hostname = config.mqtt.hostname;
+const port = config.mqtt.port;
+const mqttUri = 'mqtt://' + hostname + ':' + port;
 
-var channel = can.createRawChannel("vcan0", true);
+const channel = can.createRawChannel("vcan0", true);
 
-var client = mqtt.connect(mqttUri);
+const client = mqtt.connect(mqttUri);
 
 console.log(" OS: " + os.type() + " " + os.release() + " (" + os.arch() + ")");
 console.log("RAM: " + os.totalmem() / 1048576 + " MB (total), " + os.freemem() / 1048576 + " MB (free)");
