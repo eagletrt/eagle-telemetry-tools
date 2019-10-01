@@ -25,54 +25,69 @@ function updateCANData(message) {
     const countGPS = canData.gps.length - 1;
 
     let id_gathered = message.id;
-    const roba = message.data.toJSON().data;
-    let data1 = roba[0];
-    let data2 = roba[1];
+    const data = message.data.toJSON().data;
     let received7 = 0;
     let received8 = 0;
 
-    let firstByte = ((data1 >> 24) & 255);
+    // let firstByte = ((data1 >> 24) & 255);
+    let firstByte = data[0];
     switch (id_gathered) {
         case (0xAA):
             console.log('hv')
             if (firstByte == 0x01) {
-                canData.bms_hv[0].volt = data1 & 16777215; //0xFFFFFF
+                canData.bms_hv[0].volt = data[7] + data[6] * 10 + data[5] * 100 +
+                    data[4] * 1000 + data[3] * 10000; +
+                data[2] * 100000; //0xFFFFFF
             } else if (firstByte == 0x0A) {
-                canData.bms_hv[0].temp = (data1 >> 8) & 65535; //0xFFFF
+                canData.bms_hv[0].temp = 3 //(data1 >> 8) & 65535; //0xFFFF
             }
             break;
         case (0xB0):
-            console.log('brake throttle')
-            if (firstByte == 0x01 && countTHR < 20) {
-                canData.throttle.push((data1 >> 16) & 255);
+            console.log('--->')
+            console.log(firstByte)
+            if (firstByte == 0x01) {
+                console.log('--->throttle')
+                canData.throttle.push(data[1]);
             } else if (firstByte == 0x02 && countBRK < 10) {
-                canData.brake.push((data1 >> 16) & 255);
+                canData.brake.push(data[1]);
+                console.log('--->brake')
             }
             break;
         case (0xC0):
-            console.log('imu')
-            if (firstByte == 0x04) {
+            console.log('--->imu')
+            if (firstByte == 0x03) {
+                Console.log('---gyro-x-y')
                 canData.imu_gyro.push({
-                    x: ((data1 >> 16) & 255) * 256 + ((data1 >> 8) & 255),
-                    y: (data1 & 255) * 256 + ((data1 >> 24) & 255),
-                    z: ((data2 >> 16) & 255) * 256 + ((data2 >> 8) & 255)
+                    x: (data[2] === 1 ? -(data[0] * 256 + data[1]) : (data[0] * 256 + data[1])),
+                    y: (data[5] === 1 ? -(data[3] * 256 + data[4]) : (data[3] * 256 + data[4])),
+                    z: 6
                 });
-            } else if (firstByte == 0x05) {
+            }
+            /* else if (firstByte == 0x04) {
+                console.log('---gyro-z')
+                canData.imu_gyro.push({
+                    z: (data[2] === 1 ? -(data[0] * 256 + data[1]) : (data[0] * 256 + data[1]))
+                });
+            } */
+            else if (firstByte == 0x05) {
+                console.log('---axel')
                 canData.imu_axel.push({
-                    x: ((data1 >> 16) & 255) * 256 + ((data1 >> 8) & 255),
-                    y: (data1 & 255) * 256 + ((data1 >> 24) & 255),
-                    z: ((data2 >> 16) & 255) * 256 + ((data2 >> 8) & 255)
+                    x: data[1] * 256 + data[2],
+                    y: data[3] * 256 + data[4],
+                    z: data[5] * 256 + data[6]
                 });
             } else if (firstByte == 0x02) {
-                canData.steering_wheel_encoder.push((data1 >> 16) & 255);
+                console.log('---steering')
+                canData.steering_wheel_encoder.push(data[0]);
             }
             break;
         case (0xD0):
             console.log('gps')
             if (firstByte == 0x07) {
-                canData.gps[countGPS].latitude = (((data1 >> 16) & 255) * 256 + ((data1 >> 8) & 255)) * 100000 + ((data1 & 255) * 256 + ((data2 >> 24) & 255));
-                canData.gps[countGPS].lat_o = (data2 >> 16) & 255;
-                canData.gps[countGPS].speed = (((data2 >> 8) & 255) * 256) + (data2 & 255);
+                console.log('---lat-sped')
+                canData.gps[countGPS].latitude = 5 //(((data1 >> 16) & 255) * 256 + ((data1 >> 8) & 255)) * 100000 + ((data1 & 255) * 256 + ((data2 >> 24) & 255));
+                canData.gps[countGPS].lat_o = 5 //(data2 >> 16) & 255;
+                canData.gps[countGPS].speed = 5 //(((data2 >> 8) & 255) * 256) + (data2 & 255);
                 if (received8 == 1) {
                     received8 = 0;
                     countGPS.push({});
@@ -80,9 +95,10 @@ function updateCANData(message) {
                     received7 = 1;
                 }
             } else if (firstByte == 0x08) {
-                canData.gps[countGPS].longitude = (((data1 >> 16) & 255) * 256 + ((data1 >> 8) & 255)) * 100000 + ((data1 & 255) * 256 + ((data2 >> 24) & 255));
-                canData.gps[countGPS].lon_o = (data2 >> 16) & 255;
-                canData.gps[countGPS].altitude = (((data2 >> 8) & 255) * 256) + (data2 & 255);
+                console.log('---lon-alt')
+                canData.gps[countGPS].longitude = 7 //(((data1 >> 16) & 255) * 256 + ((data1 >> 8) & 255)) * 100000 + ((data1 & 255) * 256 + ((data2 >> 24) & 255));
+                canData.gps[countGPS].lon_o = 7 //(data2 >> 16) & 255;
+                canData.gps[countGPS].altitude = 7 //(((data2 >> 8) & 255) * 256) + (data2 & 255);
                 if (received7 == 1) {
                     received7 = 0;
                     countGPS.push({});
@@ -90,13 +106,14 @@ function updateCANData(message) {
                     received8 = 1;
                 }
             } else if (firstByte == 0x06) {
-                canData.front_wheels_encoder.push(((data1 >> 16) & 255) * 256 + ((data1 >> 8) & 255));
+                canData.front_wheels_encoder.push((data[0] * 256 + data[1]) * (data[2] === 1 ? -1 : 1));
             }
             break;
         case (0xFF):
             console.log('lv')
             if (firstByte == 0x01) {
-                canData.bms_lv[0].temp = (((data1 & 255) << 8) + ((data2 >> 24) & 255));
+                console.log('---temp')
+                canData.bms_lv[0].temp = (data[1]);
             }
             break;
         case (0xAB):
@@ -125,14 +142,14 @@ canData = defaultCanData();
 client.on('connect', () => {
     console.log('Connecting to ' + topic + '...')
 
-    client.subscribe(topic, function (err) {
+    client.subscribe(topic, function(err) {
         if (err) {
             console.error('Error in connecting ', err);
         } else {
             console.log('Connected')
             setInterval(() => {
                 client.publish(topic, JSON.stringify(canData))
-                //INSERT DB di CanData
+                    //INSERT DB di CanData
                 canData = defaultCanData();
             }, MILLIS)
         }
@@ -147,7 +164,7 @@ client.on('offline', () => {
 
 // Log any message
 channel.addListener("onMessage",
-    function (msg) {
+    function(msg) {
         updateCANData(msg);
     }
 );
