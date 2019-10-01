@@ -10,7 +10,7 @@ const port = config.mqtt.port;
 const mqttUri = 'mqtt://' + hostname + ':' + port;
 const MILLIS = 5000;
 
-const channel = can.createRawChannel("vcan0", true);
+const channel = can.createRawChannel("can0", true);
 
 const client = mqtt.connect(mqttUri);
 
