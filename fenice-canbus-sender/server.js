@@ -28,14 +28,13 @@ function updateCANData(message) {
     const roba = message.data.toJSON().data;
     let data1 = roba[0];
     let data2 = roba[1];
-    console.log(data1)
-    console.log(data2)
     let received7 = 0;
     let received8 = 0;
 
     let firstByte = ((data1 >> 24) & 255);
     switch (id_gathered) {
         case (0xAA):
+            console.log('hv')
             if (firstByte == 0x01) {
                 canData.bms_hv[0].volt = data1 & 16777215; //0xFFFFFF
             } else if (firstByte == 0x0A) {
@@ -43,6 +42,7 @@ function updateCANData(message) {
             }
             break;
         case (0xB0):
+            console.log('brake throttle')
             if (firstByte == 0x01 && countTHR < 20) {
                 canData.throttle.push((data1 >> 16) & 255);
             } else if (firstByte == 0x02 && countBRK < 10) {
@@ -50,6 +50,7 @@ function updateCANData(message) {
             }
             break;
         case (0xC0):
+            console.log('imu')
             if (firstByte == 0x04) {
                 canData.imu_gyro.push({
                     x: ((data1 >> 16) & 255) * 256 + ((data1 >> 8) & 255),
@@ -67,6 +68,7 @@ function updateCANData(message) {
             }
             break;
         case (0xD0):
+            console.log('gps')
             if (firstByte == 0x07) {
                 canData.gps[countGPS].latitude = (((data1 >> 16) & 255) * 256 + ((data1 >> 8) & 255)) * 100000 + ((data1 & 255) * 256 + ((data2 >> 24) & 255));
                 canData.gps[countGPS].lat_o = (data2 >> 16) & 255;
@@ -92,11 +94,13 @@ function updateCANData(message) {
             }
             break;
         case (0xFF):
+            console.log('lv')
             if (firstByte == 0x01) {
                 canData.bms_lv[0].temp = (((data1 & 255) << 8) + ((data2 >> 24) & 255));
             }
             break;
         case (0xAB):
+            console.log('marker')
             canData.marker = 1;
             break;
     }
