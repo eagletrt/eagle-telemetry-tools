@@ -1,8 +1,9 @@
 {
     "mqtt": {
-        "topic": ["chimera", "fenice"],
-        "hostname": "localhost",
-        "port": "1883"
+        "topic": "chimera",
+        "host": "localhost",
+        "port": "1883",
+        "interval": 500
     },
     "mongodb": {
         "address": "localhost",
