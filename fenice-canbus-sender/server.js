@@ -6,11 +6,15 @@ const shell = require('shelljs')
 
 // Getting shit from config
 const { topic: TOPIC, host: HOST, port: PORT, interval: TIME_INTERVAL } = config.mqtt;
-const CAN = config.can.port;
 const MQTT_URI = 'mqtt://' + HOST + ':' + PORT;
 
-if (CAN == "can0")
-    shell.exec('can.sh')
+if (os.arch() == "arm") {
+    shell.exec('./can.sh')
+    CAN = "can0"
+} else {
+    shell.exec('./can.sh vcan')
+    CAN = "vcan0"
+}
 
 // Connecting to can and mqtt
 const channel = can.createRawChannel(CAN, true);
