@@ -2,11 +2,15 @@ const mqtt = require('mqtt');
 const config = require('./config/config.json');
 const os = require('os');
 const can = require('socketcan');
+const shell = require('shelljs')
 
 // Getting shit from config
 const { topic: TOPIC, host: HOST, port: PORT, interval: TIME_INTERVAL } = config.mqtt;
 const CAN = config.can.port;
 const MQTT_URI = 'mqtt://' + HOST + ':' + PORT;
+
+if (CAN == "can0")
+    shell.exec('can.sh')
 
 // Connecting to can and mqtt
 const channel = can.createRawChannel(CAN, true);
@@ -41,10 +45,10 @@ client.on('connect', () => {
             console.error('Error in connecting ', err);
         } else {
             console.log('Connected')
-            // Publish every TIME_INTERVAL milliseconds
+                // Publish every TIME_INTERVAL milliseconds
             setInterval(() => {
                 client.publish(TOPIC, JSON.stringify(canData))
-                //TODO: INSERT DB di CanData
+                    //TODO: INSERT DB di CanData
                 canData = defaultCanData();
             }, TIME_INTERVAL)
         }
