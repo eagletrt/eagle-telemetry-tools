@@ -12,7 +12,7 @@
         "collections": ["chimera", "fenice"]
     },
     "can": {
-        "port": "vcan0"
+        "port": "can0"
     }
 
 }
