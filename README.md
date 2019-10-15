@@ -1,14 +1,26 @@
 <h1 align="center">Fenice Tools</h1>
 
-## `fenice-canbus-sender`
+## `canbus-sender`
 
 The best Application you have ever seen, a bad-ass solution for your problem
 Go to **The Directory** to see what we have done... 
 something impossible to normal people but for us  
 only an embedded application using javascript (laugh if you want) 
 
+### `dependencies`
 
-## `fenice-mongodb-receiver`
+- can-utils
+- node
+- mongodb
+- mosquitto 
+- mosquitto-clients
+
+```bash
+npm i
+node sender
+```
+
+## `mongodb-receiver`
 
 Multipurpose applicatione used to read data from mqtt
 and insert messages in a Mongo Database
@@ -20,7 +32,7 @@ npm i
 npm run serve
 ```
 
-## `fenice-mqtt-sender`
+## `mqtt-sender`
 
 Mqtt Application used to send random data to test insert
 and "network" performance.
