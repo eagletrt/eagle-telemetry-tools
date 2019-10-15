@@ -18,11 +18,10 @@ console.log("CPU: " + os.cpus()[0].speed + " MHz " + os.cpus()[0].model + "\n");
 
 client.on('connect', () => {
     console.log('Connecting to ' + topic + '...')
-    client.subscribe(topic, function (err) {
+    client.subscribe(topic, function(err) {
         if (err) {
             console.error('Error in connecting ', err);
-        }
-        else {
+        } else {
             console.log('Connected!');
         }
     });
@@ -34,10 +33,10 @@ client.on('offline', () => {
     console.log('Disconnected from /' + topic + '.');
 });
 
-client.on('message', function (_topic, message) {
+client.on('message', function(_topic, message) {
     try {
-        const json = deserialize(message);
-        mongo.insertData(json);
+        var data = deserialize(message);
+        mongo.insertData(data);
     } catch (error) {
         console.log('json bad format', error, message)
     }

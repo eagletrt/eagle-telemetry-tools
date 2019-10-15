@@ -8,7 +8,7 @@
 
     "mqtt": {
         "topic": ["chimera", "fenice"],
-        "hostname": "localhost",
+        "hostname": "192.168.43.189",
         "port": "1883"
     }
 }

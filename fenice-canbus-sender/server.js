@@ -3,16 +3,31 @@ const config = require('./config/config.json');
 const os = require('os');
 const can = require('socketcan');
 const shell = require('shelljs')
+const mongo = require('./src/mongodb.js');
+
 
 // Getting shit from config
 const { topic: TOPIC, host: HOST, port: PORT, interval: TIME_INTERVAL } = config.mqtt;
+let {
+    bms_hv: BMS_HV,
+    bms_lv: BMS_LV,
+    gps: GPS,
+    imu_gyro: IMU_GYRO,
+    imu_axel: IMU_AXEL,
+    front_wheels_encoder: FRONT_WHEELS_ENCODER,
+    steering_wheel_encoder: STEERIGN_WHEEL_ENCODER,
+    throttle: THROTTLE,
+    brake: BRAKE,
+} = config.data;
 const MQTT_URI = 'mqtt://' + HOST + ':' + PORT;
+
+let database = config.mongodb.insert;
 
 if (os.arch() == "arm") {
     shell.exec('./can.sh')
     CAN = "can0"
 } else {
-    shell.exec('./can.sh vcan')
+    shell.exec('./can.sh vcan0')
     CAN = "vcan0"
 }
 
@@ -41,9 +56,21 @@ function defaultCanData() {
 }
 let canData = defaultCanData();
 
+client.on('connect', function() {
+
+})
+
 // Mqtt logic
 client.on('connect', () => {
-    console.log('Connecting to ' + TOPIC + '...');
+    console.log('Connecting to config ...');
+    client.subscribe('conifg', function(err) {
+        if (err) {
+            console.error('Error in connecting ', err);
+        } else {
+
+        }
+    })
+    console.log('Connecting to ' + TOPIC + ' ...');
     client.subscribe(TOPIC, err => {
         if (err) {
             console.error('Error in connecting ', err);
@@ -52,8 +79,9 @@ client.on('connect', () => {
                 // Publish every TIME_INTERVAL milliseconds
             setInterval(() => {
                 client.publish(TOPIC, JSON.stringify(canData))
-                    //TODO: INSERT DB di CanData
+                if (database) { mongo.insertData(canData); }
                 canData = defaultCanData();
+                console.log(TOPIC)
             }, TIME_INTERVAL)
         }
     });
@@ -62,6 +90,14 @@ client.on('connect', () => {
 
 // When mqtt offline
 client.on('offline', () => {
+    database = true;
+    client.unsubscribe(TOPIC);
+    console.log('Disconnected from /' + TOPIC + '.');
+});
+
+// When mqtt offline
+client.on('offline', () => {
+    database = true;
     client.unsubscribe(TOPIC);
     console.log('Disconnected from /' + TOPIC + '.');
 });
@@ -86,22 +122,22 @@ function updateCANData(message) {
 
     switch (message.id) {
         case (0xAA):
-            if (firstByte == 0x01) {
+            if (firstByte == 0x01 && BMS_HV) {
                 canData.bms_hv[0].volt = bytes[7] + bytes[6] * 10 + bytes[5] * 100 + bytes[4] * 1000 + bytes[3] * 10000; + bytes[2] * 100000;
-            } else if (firstByte == 0x0A) {
+            } else if (firstByte == 0x0A && BMS_HV) {
                 // TODO: add right code
                 canData.bms_hv[0].temp = 3 //(data1 >> 8) & 65535; //0xFFFF
             }
             break;
         case (0xB0):
-            if (firstByte == 0x01) {
+            if (firstByte == 0x01 && THROTTLE) {
                 canData.throttle.push(bytes[1]);
-            } else if (firstByte == 0x02) {
+            } else if (firstByte == 0x02 && BRAKE) {
                 canData.brake.push(bytes[1]);
             }
             break;
         case (0xC0):
-            if (firstByte == 0x03) {
+            if (firstByte == 0x03 && IMU_GYRO) {
                 canData.imu_gyro.push({
                     x: (bytes[2] === 1 ? -(bytes[0] * 256 + bytes[1]) : (bytes[0] * 256 + bytes[1])),
                     y: (bytes[5] === 1 ? -(bytes[3] * 256 + bytes[4]) : (bytes[3] * 256 + bytes[4])),
@@ -114,18 +150,18 @@ function updateCANData(message) {
                     z: (bytes[2] === 1 ? -(bytes[0] * 256 + bytes[1]) : (bytes[0] * 256 + bytes[1]))
                 });
             } */
-            else if (firstByte == 0x05) {
+            else if (firstByte == 0x05 && IMU_AXEL) {
                 canData.imu_axel.push({
                     x: bytes[1] * 256 + bytes[2],
                     y: bytes[3] * 256 + bytes[4],
                     z: bytes[5] * 256 + bytes[6]
                 });
-            } else if (firstByte == 0x02) {
+            } else if (firstByte == 0x02 && STEERIGN_WHEEL_ENCODER) {
                 canData.steering_wheel_encoder.push(bytes[0]);
             }
             break;
         case (0xD0):
-            if (firstByte == 0x07) {
+            if (firstByte == 0x07 && GPS) {
                 canData.gps[countGPS].latitude = 5 //(((data1 >> 16) & 255) * 256 + ((data1 >> 8) & 255)) * 100000 + ((data1 & 255) * 256 + ((data2 >> 24) & 255));
                 canData.gps[countGPS].lat_o = 5 //(data2 >> 16) & 255;
                 canData.gps[countGPS].speed = 5 //(((data2 >> 8) & 255) * 256) + (data2 & 255);
@@ -135,7 +171,7 @@ function updateCANData(message) {
                 } else {
                     received7 = 1;
                 }
-            } else if (firstByte == 0x08) {
+            } else if (firstByte == 0x08 && GPS) {
                 canData.gps[countGPS].longitude = 7 //(((data1 >> 16) & 255) * 256 + ((data1 >> 8) & 255)) * 100000 + ((data1 & 255) * 256 + ((data2 >> 24) & 255));
                 canData.gps[countGPS].lon_o = 7 //(data2 >> 16) & 255;
                 canData.gps[countGPS].altitude = 7 //(((data2 >> 8) & 255) * 256) + (data2 & 255);
@@ -145,12 +181,12 @@ function updateCANData(message) {
                 } else {
                     received8 = 1;
                 }
-            } else if (firstByte == 0x06) {
+            } else if (firstByte == 0x06 && FRONT_WHEELS_ENCODER) {
                 canData.front_wheels_encoder.push((bytes[0] * 256 + bytes[1]) * (bytes[2] === 1 ? -1 : 1));
             }
             break;
         case (0xFF):
-            if (firstByte == 0x01) {
+            if (firstByte == 0x01 && BMS_LV) {
                 canData.bms_lv[0].temp = bytes[1];
             }
             break;
