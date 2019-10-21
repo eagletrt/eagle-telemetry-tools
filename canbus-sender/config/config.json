@@ -1,6 +1,7 @@
 {
     "mqtt": {
         "topic": "chimera",
+        "configtopic": "chimera/config",
         "host": "localhost",
         "port": "1883",
         "interval": 500

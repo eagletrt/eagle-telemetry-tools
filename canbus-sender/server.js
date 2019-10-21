@@ -5,9 +5,10 @@ const can = require('socketcan');
 const shell = require('shelljs')
 const mongo = require('./src/mongodb.js');
 
+// Get values from mqtt.config
+const { topic: TOPIC, configtopic: CONFIGTOPIC, host: HOST, port: PORT, interval: TIME_INTERVAL } = config.mqtt;
 
-// Getting shit from config
-const { topic: TOPIC, host: HOST, port: PORT, interval: TIME_INTERVAL } = config.mqtt;
+//Getting values from payload.config
 let {
     bms_hv: BMS_HV,
     bms_lv: BMS_LV,
@@ -19,6 +20,7 @@ let {
     throttle: THROTTLE,
     brake: BRAKE,
 } = config.data;
+
 const MQTT_URI = 'mqtt://' + HOST + ':' + PORT;
 
 let database = config.mongodb.insert;
@@ -36,7 +38,7 @@ const channel = can.createRawChannel(CAN, true);
 const client = mqtt.connect(MQTT_URI);
 
 // Logging os shit
-console.log(" OS: " + os.type() + " " + os.release() + " (" + os.arch() + ")");
+console.log("\n\nOS: " + os.type() + " " + os.release() + " (" + os.arch() + ")");
 console.log("RAM: " + os.totalmem() / 1048576 + " MB (total), " + os.freemem() / 1048576 + " MB (free)");
 console.log("CPU: " + os.cpus()[0].speed + " MHz " + os.cpus()[0].model + "\n");
 
@@ -56,49 +58,42 @@ function defaultCanData() {
 }
 let canData = defaultCanData();
 
-client.on('connect', function() {
-
-})
-
 // Mqtt logic
 client.on('connect', () => {
-    console.log('Connecting to config ...');
-    client.subscribe('conifg', function(err) {
+    client.subscribe(CONFIGTOPIC, function(err) {
         if (err) {
             console.error('Error in connecting ', err);
         } else {
-
+            console.log('Connected to ' + CONFIGTOPIC)
         }
     })
-    console.log('Connecting to ' + TOPIC + ' ...');
     client.subscribe(TOPIC, err => {
         if (err) {
             console.error('Error in connecting ', err);
         } else {
-            console.log('Connected')
+            console.log('Connected to ' + TOPIC)
                 // Publish every TIME_INTERVAL milliseconds
             setInterval(() => {
                 client.publish(TOPIC, JSON.stringify(canData))
                 if (database) { mongo.insertData(canData); }
                 canData = defaultCanData();
-                console.log(TOPIC)
             }, TIME_INTERVAL)
         }
     });
-
 });
+
+client.on('message', function(topic, message) {
+    if (topic == CONFIGTOPIC) {
+        parseConfig(message);
+    }
+
+})
 
 // When mqtt offline
 client.on('offline', () => {
     database = true;
     client.unsubscribe(TOPIC);
-    console.log('Disconnected from /' + TOPIC + '.');
-});
-
-// When mqtt offline
-client.on('offline', () => {
-    database = true;
-    client.unsubscribe(TOPIC);
+    client.unsubscribe(CONFIGTOPIC);
     console.log('Disconnected from /' + TOPIC + '.');
 });
 
@@ -109,6 +104,13 @@ channel.addListener("onMessage",
     }
 );
 channel.start();
+
+function parseConfig(message) {
+    var parsedMessage = JSON.parse(message);
+    // console.log(parsedMessage)
+    BRAKE = parsedMessage.brake;
+    console.log(BRAKE)
+}
 
 // Function to update the can data structure
 function updateCANData(message) {
