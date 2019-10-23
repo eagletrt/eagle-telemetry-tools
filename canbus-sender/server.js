@@ -3,7 +3,7 @@ const can = require('./utils/can');
 const dataModel = require('./utils/dataModel');
 const mqtt = require('./utils/mqtt');
 const scheduler = require('./utils/scheduler');
-const mongo = require('./src/mongodb.js');
+const database = require('./utils/database');
 
 // Print os info
 osInfo();
@@ -12,6 +12,6 @@ dataModel.init();
 // Initialize mqtt
 mqtt.init(dataModel);
 // Initialize scheduler
-scheduler.init(mqtt, mongo);
+scheduler.init(mqtt, database);
 // Initialize can
 can.init(scheduler, dataModel);
