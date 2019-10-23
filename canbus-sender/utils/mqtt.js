@@ -30,10 +30,12 @@ function subscribeConfig() {
 }
 
 function onConfigMessage() {
-    console.log('on config message');
+    console.log('Add listener to Config Topic');
     client.on('message', function(t, message) {
         if (t == configTopic) {
-            dataModel.update(message);
+            //console.log('message', message)
+            //console.log('messagetostring', message.toString())
+            dataModel.update(JSON.parse(message.toString()));
         }
     });
 }

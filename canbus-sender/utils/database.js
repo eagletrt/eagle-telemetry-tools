@@ -65,6 +65,7 @@ module.exports = {
 
     /*Function to add a value in a Collection*/
     insertData: function(obj) {
+        console.log('Insert Data to Chimera DB')
         insertDocumentInCollection(obj, rawDataCollection);
     },
 
