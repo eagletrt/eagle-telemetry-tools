@@ -10,7 +10,7 @@ module.exports = (canData, message) => {
         case (0xAA):
             if (firstByte == 0x01 /*&& BMS_HV*/ ) {
                 canData.bms_hv[0].volt = bytes[7] + bytes[6] * 10 + bytes[5] * 100 + bytes[4] * 1000 + bytes[3] * 10000; + bytes[2] * 100000;
-            } else if (firstByte == 0x0A && BMS_HV) {
+            } else if (firstByte == 0x0A /*&& BMS_HV*/ ) {
                 // TODO: add right code
                 canData.bms_hv[0].temp = 3 //(data1 >> 8) & 65535; //0xFFFF
             }
@@ -18,7 +18,7 @@ module.exports = (canData, message) => {
         case (0xB0):
             if (firstByte == 0x01 /*&& THROTTLE*/ ) {
                 canData.throttle.push(bytes[1]);
-            } else if (firstByte == 0x02 && BRAKE) {
+            } else if (firstByte == 0x02 /*&& BRAKE*/ ) {
                 canData.brake.push(bytes[1]);
             }
             break;
