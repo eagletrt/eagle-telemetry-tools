@@ -1,7 +1,7 @@
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectID;
 
-const config = require('../config/config.json');
+const config = require('../config/config');
 
 // MongoDB config
 const address = config.mongodb.address;
