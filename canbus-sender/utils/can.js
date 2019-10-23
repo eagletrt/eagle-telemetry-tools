@@ -30,7 +30,6 @@ function startChannel() {
 function addListener(scheduler) {
     channel.addListener("onMessage",
         message => {
-            console.log('New can message');
             scheduler.update(message);
         }
     );
