@@ -4,7 +4,7 @@ module.exports = {
         configTopic: 'chimera/config',
         host: 'localhost',
         port: 1883,
-        useBson: true
+        useBson: false
     },
     mongodb: {
         insert: true,

@@ -49,6 +49,7 @@ module.exports = {
             if (useBson) {
                 data = bson.serialize(data);
             }
+            console.log('Publishing');
             client.publish(topic, data);
         }
     }
