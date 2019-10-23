@@ -33,7 +33,7 @@ function onConfigMessage() {
     console.log('on config message');
     client.on('message', function(t, message) {
         if (t == configTopic) {
-            dataModel.update(JSON.parse(message));
+            dataModel.update(message);
         }
     });
 }
