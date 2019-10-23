@@ -52,7 +52,6 @@ module.exports = {
             else {
                 data = JSON.stringify(data);
             }
-            console.log('Publishing');
             client.publish(topic, data);
         }
     }
