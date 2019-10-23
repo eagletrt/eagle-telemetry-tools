@@ -1,0 +1,11 @@
+{
+    "bms_hv": true,
+    "bms_lv": true,
+    "gps": true,
+    "imu_gyro": true,
+    "imu_axel": true,
+    "front_wheels_encoder": true,
+    "steering_wheel_encoder": true,
+    "throttle": true,
+    "brake": true
+}
