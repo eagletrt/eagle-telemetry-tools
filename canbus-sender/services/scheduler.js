@@ -4,7 +4,7 @@ class Scheduler {
 
     _insert() {
         if (this.config.insertDatabase) {
-            this.database.insertData(this.canData);
+            this.database.insert(this.canData);
         }
     }
 

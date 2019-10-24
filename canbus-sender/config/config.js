@@ -9,12 +9,11 @@ module.exports = {
             config: 'chimera/config'
         }
     },
-    mongodb: {
-        insert: true,
-        address: 'localhost',
+    database: {
+        host: 'localhost',
         port: 27017,
         dbName: 'telemetria',
-        collections: ['chimera', 'fenice']
+        collection: 'chimera'
     },
     scheduler: {
         interval: 500,
