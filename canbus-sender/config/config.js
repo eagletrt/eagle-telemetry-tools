@@ -1,10 +1,13 @@
 module.exports = {
     mqtt: {
-        topic: 'chimera',
-        configTopic: 'chimera/config',
         host: 'localhost',
         port: 1883,
-        useBson: false
+        protocol: 'mqtt',
+        sendBson: true,
+        topic: {
+            data: 'chimera',
+            config: 'chimera/config'
+        }
     },
     mongodb: {
         insert: true,
@@ -13,13 +16,12 @@ module.exports = {
         dbName: 'telemetria',
         collections: ['chimera', 'fenice']
     },
-    can: {
-        interface: 'can0'
-    },
     scheduler: {
         interval: 500,
         insertDatabase: true,
         publishMqtt: true
     },
-    dataModel: require('./dataModel.json')
+    dataModel: {
+        path: 'data-model/dataModel.json'
+    }
 };

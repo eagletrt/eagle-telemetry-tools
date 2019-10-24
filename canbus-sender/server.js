@@ -1,17 +1,19 @@
+const config = require('./config/config');
+
 const osInfo = require('./utils/osInfo');
-const can = require('./utils/can');
-const dataModel = require('./utils/dataModel');
-const mqtt = require('./utils/mqtt');
-const scheduler = require('./utils/scheduler');
-const database = require('./utils/database');
+const Can = require('./services/can');
+const Scheduler = require('./services/scheduler');
+const DataModel = require('./services/dataModel');
+const Mqtt = require('./services/mqtt');
+const database = require('./services/database');
 
 // Print os info
 osInfo();
 // Initialize dataModel
-dataModel.init();
+const dataModel = new DataModel(config.dataModel);
 // Initialize mqtt
-mqtt.init(dataModel);
+const mqtt = new Mqtt(config.mqtt, dataModel);
 // Initialize scheduler
-scheduler.init(mqtt, database);
+const scheduler = new Scheduler(config.scheduler, mqtt, database);
 // Initialize can
-can.init(scheduler, dataModel);
+const can = new Can(scheduler, dataModel);
