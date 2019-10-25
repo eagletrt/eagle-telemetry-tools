@@ -11,11 +11,10 @@ class Database {
         console.debug('Connecting to mongodb...');
         const uri = this._getUri();
         console.log('MongoDB: uri is ', uri);
-        MongoClient.connect(uri, (error, database) => {
+        MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (error, database) => {
             if (error) {
                 console.error('Error in connecting to MongoDB ', error);
-            }
-            else {
+            } else {
                 console.debug('Connected to mongodb');
                 this.database = database;
             }
@@ -24,6 +23,7 @@ class Database {
 
     insert(data) {
         if (this.database) {
+            console.log(this.database)
             this.database
                 .collection(this.config.collection)
                 .insertOne(data, (error, _res) => {

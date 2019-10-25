@@ -22,8 +22,8 @@ class Can {
 
     _startChannel() {
         console.debug('Starting can channel...');
-        channel = can.createRawChannel(interface, true);
-        channel.start();
+        this.channel = can.createRawChannel(this.interface, true);
+        this.channel.start();
         console.debug('Can channel started');
     }
 
