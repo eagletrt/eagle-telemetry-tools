@@ -23,8 +23,8 @@ class Database {
 
     insert(data) {
         if (this.database) {
-            console.log(this.database)
             this.database
+                .db(this.config.dbName)
                 .collection(this.config.collection)
                 .insertOne(data, (error, _res) => {
                     if (error) {
