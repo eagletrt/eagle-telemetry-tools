@@ -17,15 +17,19 @@ class Scheduler {
     _startInterval() {
         console.debug('Scheduler: starting time interval...');
         this.intervalRef = setInterval(() => {
-            this._insert();
-            this._publish();
-            this.canData = defaultCanData();
+            if (this.canData) {
+                this._insert();
+                this._publish();
+                this.canData = defaultCanData();
+            }
         }, this.config.interval);
         console.debug('Scheduler: time interval started...');
     }
 
     update(message) {
-        this.canData = updateCanData(canData, message);
+        if (this.canData) {
+            updateCanData(this.canData, message);
+        }
     }
 
     stop() {

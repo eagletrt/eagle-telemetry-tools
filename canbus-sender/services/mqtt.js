@@ -16,7 +16,7 @@ class Mqtt {
         this.client.on('connect', () => {
             console.debug('Mqtt: connected to mqtt');
             this.connected = true;
-            this._subscribeConfig();
+            this._subscribeToConfig();
             this._onConfigMessage();
         });
     }
@@ -34,10 +34,10 @@ class Mqtt {
 
     _onConfigMessage() {
         console.debug('Mqtt: adding listener to Config Topic...');
-        client.on('message', (topic, message) => {
+        this.client.on('message', (topic, message) => {
             switch (topic) {
                 case this.config.topic.config:
-                    dataModel.update(JSON.parse(message.toString()));
+                    this.dataModel.update(JSON.parse(message.toString()));
                     break;
             }
         });
@@ -49,11 +49,10 @@ class Mqtt {
         if (this.connected) {
             if (this.config.sendBson) {
                 data = bson.serialize(data);
-            }
-            else {
+            } else {
                 data = JSON.stringify(data);
             }
-            client.publish(this.config.topic.data, data);
+            this.client.publish(this.config.topic.data, data);
         }
     }
 
