@@ -2,7 +2,7 @@
   "name": "fenice-canbus-sender",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "main.js",
   "dependencies": {
     "bson": "^4.0.2",
     "mongodb": "^3.3.2",
@@ -12,7 +12,7 @@
     "socketcan": "^2.5.0"
   },
   "scripts": {
-    "start": "node server"
+    "start": "node main"
   },
   "author": "Eugenio Berretta",
   "license": "ISC"
