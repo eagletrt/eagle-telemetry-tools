@@ -25,10 +25,8 @@ class DataModel {
 
     constructor(config) {
         this.config = config;
-        // Fix it To absolute path
-        // this.modelPath = path.join(__dirname, this.config.path);
-        // this.model = require(this.modelPath);
-        this.model = require('../data-model/dataModel.json');
+        this.modelPath = path.relative(__dirname, this.config.path);
+        this.model = require(this.modelPath);
         this.handlers = [{ name: 'updateDataModelJson', handler: model => this._updateDataModelJson(model) }];
     }
 
