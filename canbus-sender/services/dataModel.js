@@ -4,7 +4,7 @@ const path = require('path');
 class DataModel {
 
     _updateDataModelJson(model) {
-        fs.writeFileSync(this.modelPath, JSON.stringify(model));
+        fs.writeFileSync(this.modelPath, JSON.stringify(model, null, 3));
     }
 
     update(model) {
