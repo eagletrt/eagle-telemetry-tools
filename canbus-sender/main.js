@@ -16,6 +16,6 @@ const database = new Database(config.database);
 // Initialize mqtt
 const mqtt = new Mqtt(config.mqtt, dataModel);
 // Initialize scheduler
-const scheduler = new Scheduler(config.scheduler, mqtt, database);
+const scheduler = new Scheduler(config.scheduler, mqtt, database, dataModel);
 // Initialize can
 const can = new Can(scheduler, dataModel);

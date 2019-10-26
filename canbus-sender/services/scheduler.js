@@ -1,4 +1,4 @@
-const { updateCanData, defaultCanData } = require('../utils/canDataUtils');
+const { updateCanData, defaultCanData, purgeCanData } = require('../utils/can-data-utils');
 
 class Scheduler {
 
@@ -26,9 +26,10 @@ class Scheduler {
         console.debug('Scheduler: time interval started...');
     }
 
-    update(message) {
+    update(message, timestamp) {
         if (this.canData) {
-            updateCanData(this.canData, message);
+            updateCanData(this.canData, message, timestamp);
+            purgeCanData(this.canData, this.model);
         }
     }
 
@@ -38,10 +39,14 @@ class Scheduler {
         console.debug('Scheduler: timeinterval stopped...');
     }
 
-    constructor(config, mqtt, database) {
+    constructor(config, mqtt, database, dataModel) {
         this.config = config;
         this.mqtt = mqtt;
         this.database = database;
+        this.model = dataModel.subscribe({ 
+            name: 'scheduler', 
+            handler: model => this.model = model 
+        });
 
         this.canData = defaultCanData();
         this._startInterval();

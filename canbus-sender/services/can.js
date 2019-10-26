@@ -3,6 +3,8 @@ const os = require('os');
 const shell = require('shelljs');
 const can = require('socketcan');
 
+const updateDataModel = require('../utils/updateDataModel');
+
 // Module class
 class Can {
 
@@ -31,7 +33,9 @@ class Can {
         console.log('Adding can onMessage listener...');
         this.channel.addListener("onMessage",
             message => {
-                this.scheduler.update(message);
+                const timestamp = Date.now();
+                this.scheduler.update(message, timestamp);
+                updateDataModel(message, this.dataModel);
             }
         );
         console.log('Can onMessage listener created');
