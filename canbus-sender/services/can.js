@@ -4,6 +4,11 @@ const shell = require('shelljs');
 const can = require('socketcan');
 
 const updateDataModel = require('../utils/updateDataModel');
+const log = require('../utils/logger')({ 
+    serviceName: 'CAN',
+    serviceColor: 'magenta',
+    showTimestamp: true
+});
 
 // Module class
 class Can {
@@ -11,7 +16,7 @@ class Can {
     // Private methods
     _startShell() {
         // TODO: only if needed
-        console.debug('Starting can shell...');
+        log.log('Starting can shell...');
         if (os.arch() == "arm") {
             shell.exec('./tools/can.sh')
             this.interface = "can0"
@@ -19,26 +24,36 @@ class Can {
             shell.exec('./tools/can.sh vcan0');
             this.interface = "vcan0"
         }
-        console.debug('Can shell started...');
+        log.success('Can shell started');
     }
 
     _startChannel() {
-        console.debug('Starting can channel...');
-        this.channel = can.createRawChannel(this.interface, true);
-        this.channel.start();
-        console.debug('Can channel started');
+        try {
+            log.log('Starting can channel...');
+            this.channel = can.createRawChannel(this.interface, true);
+            this.channel.start();
+            log.success('Can channel started');
+        }
+        catch(error) {
+            log.error('Error in starting can channel', error);
+        }
     }
 
     _addListener() {
-        console.log('Adding can onMessage listener...');
-        this.channel.addListener("onMessage",
-            message => {
-                const timestamp = Date.now();
-                this.scheduler.update(message, timestamp);
-                updateDataModel(message, this.dataModel);
-            }
-        );
-        console.log('Can onMessage listener created');
+        try {
+            log.log('Adding onMessage listener...');
+            this.channel.addListener("onMessage",
+                message => {
+                    const timestamp = Date.now();
+                    this.scheduler.update(message, timestamp);
+                    updateDataModel(message, this.dataModel);
+                }
+            );
+            log.success('Can onMessage listener created');
+        }
+        catch(error) {
+            log.error('Error in adding onMessage listener', error);
+        }
     }
 
     // Constructor

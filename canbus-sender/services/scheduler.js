@@ -1,4 +1,9 @@
 const { updateCanData, defaultCanData, purgeCanData } = require('../utils/can-data-utils');
+const log = require('../utils/logger')({ 
+    serviceName: 'SCHEDULER',
+    serviceColor: 'cyan',
+    showTimestamp: true
+});
 
 class Scheduler {
 
@@ -15,7 +20,7 @@ class Scheduler {
     }
 
     _startInterval() {
-        console.debug('Scheduler: starting time interval...');
+        log.log('Starting time interval...');
         this.intervalRef = setInterval(() => {
             if (this.canData) {
                 this._insert();
@@ -23,7 +28,7 @@ class Scheduler {
                 this.canData = defaultCanData();
             }
         }, this.config.interval);
-        console.debug('Scheduler: time interval started...');
+        log.success('Time interval started');
     }
 
     update(message, timestamp) {

@@ -1,4 +1,9 @@
 const { MongoClient } = require('mongodb');
+const log = require('../utils/logger')({ 
+    serviceName: 'DB',
+    serviceColor: 'yellow',
+    showTimestamp: true
+});
 
 class Database {
 
@@ -8,16 +13,16 @@ class Database {
     }
 
     _connect() {
-        console.debug('Connecting to mongodb...');
+        log.log('Connecting to mongodb...');
         const uri = this._getUri();
-        console.log('MongoDB: uri is ', uri);
+        log.debug('MongoDB: uri is ' + uri);
         this.collection = `${this.config.collection}-${(new Date()).toLocaleString().replace(/\s/g,'-')}`
-        console.log('MongoDB: collection is ', this.collection);
+        log.debug('MongoDB: collection is ' + this.collection);
         MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (error, database) => {
             if (error) {
-                console.error('Error in connecting to MongoDB ', error);
+                log.error('Error in connecting to MongoDB ', error);
             } else {
-                console.debug('Connected to mongodb');
+                log.success('Connected to mongodb');
                 this.database = database;
             }
         });
@@ -30,7 +35,7 @@ class Database {
                 .collection(this.collection)
                 .insertOne(data, (error, _res) => {
                     if (error) {
-                        console.error('Error in inserting data to mongodb ', error);
+                        log.error('Error in inserting data to mongodb ', error);
                     }
                 });
         }

@@ -1,5 +1,10 @@
 const mqtt = require('mqtt');
 const bson = require('bson');
+const log = require('../utils/logger')({ 
+    serviceName: 'MQTT',
+    serviceColor: 'green',
+    showTimestamp: true
+});
 
 class Mqtt {
 
@@ -9,12 +14,12 @@ class Mqtt {
     }
 
     _connect() {
-        console.debug('Mqtt: connecting to mqtt...');
+        log.log('Connecting to mqtt...');
         const uri = this._getUri();
-        console.debug('Mqtt: uri is ' + uri);
+        log.debug('Uri is ' + uri);
         this.client = mqtt.connect(uri);
         this.client.on('connect', () => {
-            console.debug('Mqtt: connected to mqtt');
+            log.success('Connected to mqtt');
             this.connected = true;
             this._subscribeToConfig();
             this._onConfigMessage();
@@ -22,18 +27,19 @@ class Mqtt {
     }
 
     _subscribeToConfig() {
-        console.debug('Mqtt: subscribing to mqtt config...');
+        log.log('Subscribing to config topic...');
+        log.debug('Config Topic is ' + this.config.topic.config);
         this.client.subscribe(this.config.topic.config, error => {
             if (error) {
-                console.error('Error in connecting to ' + this.config.topic.config, error);
+                log.error('Error in connecting to ' + this.config.topic.config, error);
             } else {
-                console.debug('Mqtt: subscribed to mqtt config');
+                log.success('Subscribed to config topic');
             }
         });
     }
 
     _onConfigMessage() {
-        console.debug('Mqtt: adding listener to Config Topic...');
+        log.log('Adding listener to Config Topic...');
         this.client.on('message', (topic, message) => {
             switch (topic) {
                 case this.config.topic.config:
@@ -41,7 +47,7 @@ class Mqtt {
                     break;
             }
         });
-        console.debug('Mqtt: listener added to Config Topic...');
+        log.success('Listener added to Config Topic');
     }
 
 
