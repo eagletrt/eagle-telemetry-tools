@@ -2,8 +2,7 @@ const mqtt = require('mqtt');
 const bson = require('bson');
 const log = require('../utils/logger')({ 
     serviceName: 'MQTT',
-    serviceColor: 'green',
-    showTimestamp: true
+    serviceColor: 'green'
 });
 
 class Mqtt {

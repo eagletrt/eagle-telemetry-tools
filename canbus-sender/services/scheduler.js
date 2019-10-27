@@ -1,8 +1,7 @@
 const { updateCanData, defaultCanData, purgeCanData } = require('../utils/can-data-utils');
 const log = require('../utils/logger')({ 
     serviceName: 'SCHEDULER',
-    serviceColor: 'cyan',
-    showTimestamp: true
+    serviceColor: 'cyan'
 });
 
 class Scheduler {

@@ -22,5 +22,9 @@ module.exports = {
     },
     dataModel: {
         path: 'data-model/dataModel.json'
+    },
+    logger: {
+        timestamp: true,
+        debug: true
     }
 };

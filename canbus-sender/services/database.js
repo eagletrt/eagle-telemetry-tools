@@ -1,8 +1,7 @@
 const { MongoClient } = require('mongodb');
 const log = require('../utils/logger')({ 
     serviceName: 'DB',
-    serviceColor: 'yellow',
-    showTimestamp: true
+    serviceColor: 'yellow'
 });
 
 class Database {

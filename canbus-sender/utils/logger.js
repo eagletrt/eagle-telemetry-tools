@@ -1,9 +1,11 @@
 const chalk = require('chalk');
 
+const config = require('../config/config').logger;
+
 class Logger {
 
     _getTimestamp() {
-        return chalk.bold(this.showTimestamp ? `[${this.generateTimestamp()}]` : ``);
+        return chalk.bold(config.timestamp ? `[${this.generateTimestamp()}]` : ``);
     }
 
     _getService() {
@@ -15,7 +17,9 @@ class Logger {
     }
 
     debug(message, obj) {
-        console.log(`${this._getTimestamp()} ${this._getService()} ${chalk.grey.bold('[DEBUG]')} ${chalk.grey(message)}`, obj || '');
+        if (config.debug) {
+            console.log(`${this._getTimestamp()} ${this._getService()} ${chalk.grey.bold('[DEBUG]')} ${chalk.grey(message)}`, obj || '');
+        }
     }
 
     success(message, obj) {
@@ -30,11 +34,10 @@ class Logger {
         console.log(`${this._getTimestamp()} ${this._getService()} ${chalk.red.bold('[ERROR]')} ${chalk.red(message)}`, error || '');
     }
 
-    constructor(config) {
-        this.serviceName = config.serviceName;
-        this.serviceColor = config.serviceColor || 'yellow';
-        this.showTimestamp = config.showTimestamp;
-        this.generateTimestamp = config.generateTimestamp || ( () => Date.now() );
+    constructor(configurations) {
+        this.serviceName = configurations.serviceName;
+        this.serviceColor = configurations.serviceColor || 'yellow';
+        this.generateTimestamp = config.generateTimestamp || (() => Date.now());
     }
 
 }

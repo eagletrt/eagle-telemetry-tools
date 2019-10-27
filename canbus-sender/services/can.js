@@ -6,8 +6,7 @@ const can = require('socketcan');
 const updateDataModel = require('../utils/updateDataModel');
 const log = require('../utils/logger')({ 
     serviceName: 'CAN',
-    serviceColor: 'magenta',
-    showTimestamp: true
+    serviceColor: 'magenta'
 });
 
 // Module class
