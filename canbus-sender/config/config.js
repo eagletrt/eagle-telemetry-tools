@@ -25,6 +25,6 @@ module.exports = {
     },
     logger: {
         timestamp: true,
-        debug: false
+        debug: false || (process.argv.slice(2).indexOf('debug') !== -1)
     }
 };
