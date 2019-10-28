@@ -25,6 +25,6 @@ module.exports = {
     },
     logger: {
         timestamp: true,
-        debug: true
+        debug: false
     }
 };
