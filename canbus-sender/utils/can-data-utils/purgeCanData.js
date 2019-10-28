@@ -10,6 +10,7 @@ module.exports = function purgeCanData(canData, dataModel) {
     // Delete parameters which are not in the dataModel
     for (const param in dataModel) {
         console.log(param)
+        console.log('dataModel.param', dataModel.param)
         if (!dataModel.param) {
             console.log('ci entra')
             delete canData[param];
