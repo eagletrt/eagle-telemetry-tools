@@ -141,6 +141,7 @@ function updateBmsLv(canData, firstByte, dataLeft, dataRight, _timestamp) {
 }
 
 module.exports = function updateCanData(canData, message, timestamp) {
+    console.log(canData)
     // Gets message's bytes
     const bytes = message.data.toJSON().data;
     // Left and right parts of the message
