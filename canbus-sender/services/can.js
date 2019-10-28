@@ -2,6 +2,7 @@
 const os = require('os');
 const shell = require('shelljs');
 const can = require('socketcan');
+const path = require('path');
 
 const updateDataModel = require('../utils/updateDataModel');
 const log = require('../utils/logger')({ 
@@ -17,10 +18,10 @@ class Can {
         // TODO: only if needed
         log.log('Starting can shell...');
         if (os.arch() == "arm") {
-            shell.exec('./tools/can.sh')
+            shell.exec('sh ' + path.join(__dirname, '../tools/can.sh'))
             this.interface = "can0"
         } else {
-            shell.exec('./tools/can.sh vcan0');
+            shell.exec('sh ' + path.join(__dirname, '../tools/can.sh') + ' vcan0');
             this.interface = "vcan0"
         }
         log.success('Can shell started');

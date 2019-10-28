@@ -53,7 +53,7 @@ function updateImuOrSwe(canData, firstByte, dataLeft, dataLeft, timestamp) {
             break;
         // imu axel
         case 0x05:
-            canData.imy_axel.push({
+            canData.imu_axel.push({
                 timestamp,
                 value: {
                     x: ((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255),
