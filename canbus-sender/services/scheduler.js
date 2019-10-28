@@ -24,7 +24,7 @@ class Scheduler {
             log.debug('Flushing the toilet 2');
             if (this.canData) {
                 log.debug('Flushing the toilet 1');
-                //purgeCanData(this.canData, this.model);
+                purgeCanData(this.canData, this.model);
                 this._insert();
                 this._publish();
                 this.canData = defaultCanData();

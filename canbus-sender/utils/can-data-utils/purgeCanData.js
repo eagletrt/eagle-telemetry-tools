@@ -5,9 +5,13 @@ module.exports = function purgeCanData(canData, dataModel) {
     delete canData.receivedBmsHvVolt;
     delete canData.receivedBmsHvTemp;
 
+    console.log(dataModel)
+
     // Delete parameters which are not in the dataModel
     for (const param in dataModel) {
+        console.log(param)
         if (!dataModel.param) {
+            console.log('ci entra')
             delete canData[param];
         }
     }
