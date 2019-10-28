@@ -12,7 +12,7 @@ function updateBmsHv(canData, firstByte, dataLeft, _dataRight, timestamp) {
             canData.bms_hv[last].volt = dataLeft & 16777215;
             canData.receivedBmsHvVolt = true;
             break;
-        // temp
+            // temp
         case 0x0A:
             canData.bms_hv[last].temp = (dataLeft >> 8) & 65535;
             canData.receivedBmsHvTemp = true;
@@ -31,7 +31,7 @@ function updatePedals(canData, firstByte, dataLeft, _dataRight, timestamp) {
         case 0x01:
             canData.throttle.push({ timestamp, value: ((dataLeft >> 16) & 255) });
             break;
-        // brake
+            // brake
         case 0x02:
             canData.brake.push({ timestamp, value: ((dataLeft >> 16) & 255) });
             break;
@@ -51,7 +51,7 @@ function updateImuOrSwe(canData, firstByte, dataLeft, dataRight, timestamp) {
                 }
             });
             break;
-        // imu axel
+            // imu axel
         case 0x05:
             canData.imu_axel.push({
                 timestamp,
@@ -62,7 +62,7 @@ function updateImuOrSwe(canData, firstByte, dataLeft, dataRight, timestamp) {
                 }
             });
             break;
-        // steering wheel encoder
+            // steering wheel encoder
         case 0x02:
             canData.steering_wheel_encoder.push({ timestamp, value: ((dataLeft >> 16) & 255) });
             break;
@@ -89,38 +89,40 @@ function updateGpsAndFrontWheelsEncoder(canData, firstByte, dataLeft, dataRight,
     // Switch on the first byte
     switch (firstByte) {
         // latitude and speed
-        case 0x01: {
-            // If none is received, create a new object
-            gpsNoneReceived();
-            // Gets the index of the last element
-            const last = canData.gps.length - 1;
-            // Updates the last element
-            canData[last].latitude = (((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255)) * 100000 + ((dataLeft & 255) * 256 + ((dataRight >> 24) & 255));
-            canData[last].lat_o = (dataRight >> 16) & 255;
-            canData[last].speed = (((dataRight >> 8) & 255) * 256) + (dataRight & 255);
-            // Set receivedLatitude to true
-            canData.receivedLatitude = true;
-            // If both are received, make them false so that a new object will be created next time
-            gpsBothReceived();
-            break;
-        }
-        // longitude and altitude
-        case 0x02: {
-            // If none is received, create a new object
-            gpsNoneReceived();
-            // Gets the index of the last element
-            const last = canData.gps.length - 1;
-            // Updates the last element
-            canData[last].longitude = (((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255)) * 100000 + ((dataLeft & 255) * 256 + ((dataRight >> 24) & 255));
-            canData[last].lon_o = (dataRight >> 16) & 255;
-            canData[last].altitude = (((dataRight >> 8) & 255) * 256) + (dataRight & 255);
-            // Set receivedLongitude to true
-            canData.receivedLongitude = true;
-            // If both are received, make them false so that a new object will be created next time
-            gpsBothReceived();
-            break;
-        }
-        // front wheels encoder
+        case 0x01:
+            {
+                // If none is received, create a new object
+                gpsNoneReceived();
+                // Gets the index of the last element
+                const last = canData.gps.length - 1;
+                // Updates the last element
+                canData[last].latitude = (((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255)) * 100000 + ((dataLeft & 255) * 256 + ((dataRight >> 24) & 255));
+                canData[last].lat_o = (dataRight >> 16) & 255;
+                canData[last].speed = (((dataRight >> 8) & 255) * 256) + (dataRight & 255);
+                // Set receivedLatitude to true
+                canData.receivedLatitude = true;
+                // If both are received, make them false so that a new object will be created next time
+                gpsBothReceived();
+                break;
+            }
+            // longitude and altitude
+        case 0x02:
+            {
+                // If none is received, create a new object
+                gpsNoneReceived();
+                // Gets the index of the last element
+                const last = canData.gps.length - 1;
+                // Updates the last element
+                canData[last].longitude = (((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255)) * 100000 + ((dataLeft & 255) * 256 + ((dataRight >> 24) & 255));
+                canData[last].lon_o = (dataRight >> 16) & 255;
+                canData[last].altitude = (((dataRight >> 8) & 255) * 256) + (dataRight & 255);
+                // Set receivedLongitude to true
+                canData.receivedLongitude = true;
+                // If both are received, make them false so that a new object will be created next time
+                gpsBothReceived();
+                break;
+            }
+            // front wheels encoder
         case 0x06:
             canData.front_wheels_encoder.push({ timestamp, value: ((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255) });
             break;
@@ -130,7 +132,7 @@ function updateGpsAndFrontWheelsEncoder(canData, firstByte, dataLeft, dataRight,
 
 function updateBmsLv(canData, firstByte, dataLeft, dataRight, _timestamp) {
     if (!canData.bms_lv.length) {
-        canData.bms_lv.push({});
+        canData.bms_lv.push([]);
     }
     switch (firstByte) {
         // temp
@@ -154,23 +156,23 @@ module.exports = function updateCanData(canData, message, timestamp) {
         case (0XAA):
             updateBmsHv(canData, firstByte, dataLeft, dataRight, timestamp);
             break;
-        // Pedals
+            // Pedals
         case (0xB0):
             updatePedals(canData, firstByte, dataLeft, dataRight, timestamp);
             break;
-        // Imu and SteeringWheelEncoder
+            // Imu and SteeringWheelEncoder
         case (0xC0):
             updateImuOrSwe(canData, firstByte, dataLeft, dataRight, timestamp);
             break;
-        // Gps and FrontWheelsEncoder
+            // Gps and FrontWheelsEncoder
         case (0xD0):
             updateGpsAndFrontWheelsEncoder(canData, firstByte, dataLeft, dataRight, timestamp);
             break;
-        // BmsLv
+            // BmsLv
         case (0xFF):
             updateBmsLv(canData, firstByte, dataLeft, dataRight, timestamp);
             break;
-        // Marker
+            // Marker
         case (0xAB):
             canData.marker = true;
             // update data model...
