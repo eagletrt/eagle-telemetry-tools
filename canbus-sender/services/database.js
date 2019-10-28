@@ -28,8 +28,9 @@ class Database {
     }
 
     insert(data) {
+        log.debug('Inserting data 1');
         if (this.database) {
-            log.debug('Inserting data');
+            log.debug('Inserting data 2');
             this.database
                 .db(this.config.dbName)
                 .collection(this.collection)

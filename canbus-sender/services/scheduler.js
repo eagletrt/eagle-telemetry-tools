@@ -21,8 +21,9 @@ class Scheduler {
     _startInterval() {
         log.log('Starting time interval...');
         this.intervalRef = setInterval(() => {
+            log.debug('Flushing the toilet 2');
             if (this.canData) {
-                log.debug('Flushing the toilet');
+                log.debug('Flushing the toilet 1');
                 purgeCanData(this.canData, this.model);
                 this._insert();
                 this._publish();
