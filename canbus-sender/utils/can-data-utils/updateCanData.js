@@ -39,6 +39,7 @@ function updatePedals(canData, firstByte, dataLeft, _dataRight, timestamp) {
 }
 
 function updateImuOrSwe(canData, firstByte, dataLeft, dataLeft, timestamp) {
+    console.log('second ', canData)
     switch (firstByte) {
         // imu gyro
         case 0x04:
@@ -141,7 +142,7 @@ function updateBmsLv(canData, firstByte, dataLeft, dataRight, _timestamp) {
 }
 
 module.exports = function updateCanData(canData, message, timestamp) {
-    console.log(canData)
+    console.log('root ', canData)
     // Gets message's bytes
     const bytes = message.data.toJSON().data;
     // Left and right parts of the message
