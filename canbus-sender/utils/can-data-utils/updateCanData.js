@@ -38,7 +38,7 @@ function updatePedals(canData, firstByte, dataLeft, _dataRight, timestamp) {
     }
 }
 
-function updateImuOrSwe(canData, firstByte, dataLeft, dataLeft, timestamp) {
+function updateImuOrSwe(canData, firstByte, dataLeft, dataRight, timestamp) {
     switch (firstByte) {
         // imu gyro
         case 0x04:
