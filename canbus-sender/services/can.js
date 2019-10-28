@@ -44,6 +44,7 @@ class Can {
             log.log('Adding onMessage listener...');
             this.channel.addListener("onMessage",
                 message => {
+                    log.debug('Message received');
                     const timestamp = Date.now();
                     this.scheduler.update(message, timestamp);
                     updateDataModel(message, this.dataModel);

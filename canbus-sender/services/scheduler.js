@@ -22,6 +22,7 @@ class Scheduler {
         log.log('Starting time interval...');
         this.intervalRef = setInterval(() => {
             if (this.canData) {
+                log.debug('Flushing the toilet');
                 purgeCanData(this.canData, this.model);
                 this._insert();
                 this._publish();
@@ -33,14 +34,15 @@ class Scheduler {
 
     update(message, timestamp) {
         if (this.canData) {
+            log.debug('Updating can data');
             updateCanData(this.canData, message, timestamp);
         }
     }
 
     stop() {
-        console.debug('Scheduler: Stopping timeinterval...');
+        log.log('Stopping timeinterval...');
         clearInterval(this.intervalRef);
-        console.debug('Scheduler: timeinterval stopped...');
+        log.success('Timeinterval stopped');
     }
 
     constructor(config, mqtt, database, dataModel) {

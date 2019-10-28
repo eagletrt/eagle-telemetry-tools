@@ -15,7 +15,7 @@ class Mqtt {
     _connect() {
         log.log('Connecting to mqtt...');
         const uri = this._getUri();
-        log.debug('Uri is ' + uri);
+        log.log('Uri is ' + uri);
         this.client = mqtt.connect(uri);
         this.client.on('connect', () => {
             log.success('Connected to mqtt');
@@ -27,7 +27,7 @@ class Mqtt {
 
     _subscribeToConfig() {
         log.log('Subscribing to config topic...');
-        log.debug('Config Topic is ' + this.config.topic.config);
+        log.log('Config Topic is ' + this.config.topic.config);
         this.client.subscribe(this.config.topic.config, error => {
             if (error) {
                 log.error('Error in connecting to ' + this.config.topic.config, error);
@@ -52,6 +52,7 @@ class Mqtt {
 
     publish(data) {
         if (this.connected) {
+            log.debug('Publishing data');
             if (this.config.sendBson) {
                 data = bson.serialize(data);
             } else {

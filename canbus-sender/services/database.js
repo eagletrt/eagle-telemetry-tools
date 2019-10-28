@@ -14,9 +14,9 @@ class Database {
     _connect() {
         log.log('Connecting to mongodb...');
         const uri = this._getUri();
-        log.debug('MongoDB: uri is ' + uri);
+        log.log('MongoDB: uri is ' + uri);
         this.collection = `${this.config.collection}-${(new Date()).toLocaleString().replace(/\s/g,'-')}`
-        log.debug('MongoDB: collection is ' + this.collection);
+        log.log('MongoDB: collection is ' + this.collection);
         MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (error, database) => {
             if (error) {
                 log.error('Error in connecting to MongoDB ', error);
@@ -29,6 +29,7 @@ class Database {
 
     insert(data) {
         if (this.database) {
+            log.debug('Inserting data');
             this.database
                 .db(this.config.dbName)
                 .collection(this.collection)
