@@ -47,7 +47,7 @@ function updateImuOrSwe(canData, firstByte, dataLeft, dataLeft, timestamp) {
                 value: {
                     x: ((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255),
                     y: (dataLeft & 255) * 256 + ((dataLeft >> 24) & 255),
-                    z: ((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255)
+                    z: ((dataRight >> 16) & 255) * 256 + ((dataRight >> 8) & 255)
                 }
             });
             break;
@@ -58,7 +58,7 @@ function updateImuOrSwe(canData, firstByte, dataLeft, dataLeft, timestamp) {
                 value: {
                     x: ((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255),
                     y: (dataLeft & 255) * 256 + ((dataLeft >> 24) & 255),
-                    z: ((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255)
+                    z: ((dataRight >> 16) & 255) * 256 + ((dataRight >> 8) & 255)
                 }
             });
             break;
