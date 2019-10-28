@@ -22,6 +22,7 @@ class Scheduler {
         log.log('Starting time interval...');
         this.intervalRef = setInterval(() => {
             if (this.canData) {
+                purgeCanData(this.canData, this.model);
                 this._insert();
                 this._publish();
                 this.canData = defaultCanData();
@@ -33,7 +34,6 @@ class Scheduler {
     update(message, timestamp) {
         if (this.canData) {
             updateCanData(this.canData, message, timestamp);
-            purgeCanData(this.canData, this.model);
         }
     }
 
