@@ -37,6 +37,7 @@ class Scheduler {
         if (this.canData) {
             log.debug('Updating can data');
             updateCanData(this.canData, message, timestamp);
+            log.debug('Updating candata', this.canData)
         }
     }
 

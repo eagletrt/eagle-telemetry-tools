@@ -30,7 +30,7 @@ class Database {
     insert(data) {
         log.debug('Inserting data 1');
         if (this.database) {
-            log.debug('Inserting data 2');
+            log.debug('Inserting data 2', data);
             this.database
                 .db(this.config.dbName)
                 .collection(this.collection)
