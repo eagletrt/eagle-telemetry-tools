@@ -15,8 +15,10 @@ class Database {
         log.log('Connecting to mongodb...');
         const uri = this._getUri();
         log.log('MongoDB: uri is ' + uri);
-        this.collection = `${this.config.collection}-${(new Date()).toLocaleString().replace(/\s/g,'-')}`
-        log.log('MongoDB: collection is ' + this.collection);
+        this.structuredCollection = `${this.config.collection.structured}-${(new Date()).toLocaleString().replace(/\s/g,'-')}`
+        log.log('MongoDB: structured collection is ' + this.structuredCollection);
+        this.matlabCollection = `${this.config.collection.matlab}-${(new Date()).toLocaleString().replace(/\s/g,'-')}`
+        log.log('MongoDB: matlab collectoin is ' + this.matlabCollection);
         MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (error, database) => {
             if (error) {
                 log.error('Error in connecting to MongoDB ', error);
@@ -27,15 +29,29 @@ class Database {
         });
     }
 
-    insert(data) {
+    insertStructured(data) {
         if (this.database) {
-            log.debug('Inserting data');
+            log.debug('Inserting structured data');
             this.database
                 .db(this.config.dbName)
-                .collection(this.collection)
+                .collection(this.structuredCollection)
                 .insertOne(data, (error, _res) => {
                     if (error) {
-                        log.error('Error in inserting data to mongodb ', error);
+                        log.error('Error in inserting structured data to mongodb ', error);
+                    }
+                });
+        }
+    }
+
+    insertMatlab(data) {
+        if (this.database) {
+            log.debug('Inserting matlab data');
+            this.database
+                .db(this.config.dbName)
+                .collection(this.matlabCollection)
+                .insertOne(data, (error, _res) => {
+                    if (error) {
+                        log.error('Error in inserting matlab data to mongodb ', error);
                     }
                 });
         }

@@ -1,4 +1,4 @@
-const { updateCanData, defaultCanData, purgeCanData } = require('../utils/can-data-utils');
+const { updateCanData, defaultCanData, purgeCanData, updateMatlabData } = require('../utils/can-data-utils');
 const log = require('../utils/logger')({ 
     serviceName: 'SCHEDULER',
     serviceColor: 'cyan'
@@ -6,9 +6,16 @@ const log = require('../utils/logger')({
 
 class Scheduler {
 
-    _insert() {
-        if (this.config.insertDatabase) {
-            this.database.insert(this.canData);
+    _insertStructured() {
+        if (this.config.insertDatabaseStructured) {
+            this.database.insertStructured(this.canData);
+        }
+    }
+
+    _insertMatlab(message, timestamp) {
+        const matlabData = updateMatlabData(message, timestamp);
+        if (this.config.insertDatabaseMatlab) {
+            this.database.insertMatlab(matlabData);
         }
     }
 
@@ -24,7 +31,7 @@ class Scheduler {
             if (this.canData) {
                 log.debug('Flushing the toilet');
                 purgeCanData(this.canData, this.model);
-                this._insert();
+                this._insertStructured();
                 this._publish();
                 this.canData = defaultCanData();
             }
@@ -37,6 +44,7 @@ class Scheduler {
             log.debug('Updating can data');
             updateCanData(this.canData, message, timestamp);
         }
+        this.insertMatlab(message, timestamp);
     }
 
     stop() {

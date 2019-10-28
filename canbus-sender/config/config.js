@@ -13,11 +13,15 @@ module.exports = {
         host: 'localhost',
         port: 27017,
         dbName: 'telemetria',
-        collection: 'chimera'
+        collections: {
+            structured: 'chimera',
+            matlab: 'chimera-matlab'
+        }
     },
     scheduler: {
         interval: 500,
-        insertDatabase: true,
+        insertDatabaseMatlab: true,
+        insertDatabaseStructured: true,
         publishMqtt: true
     },
     dataModel: {
