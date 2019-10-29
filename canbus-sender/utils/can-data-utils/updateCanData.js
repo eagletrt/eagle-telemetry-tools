@@ -5,9 +5,9 @@ function updateBmsHv(canData, firstByte, dataLeft, dataRight, timestamp) {
             canData.bms_hv.voltage.push({
                 timestamp,
                 value: {
-                    total: (dataLeft & 0x00FFFFFF) / 10_000,
-                    max: ((dataRight >> 16) & 0x0000FFFF) / 10_000,
-                    min: (dataRight & 0x0000FFFF) / 10_000
+                    total: (dataLeft & 0x00FFFFFF) / 10000,
+                    max: ((dataRight >> 16) & 0x0000FFFF) / 10000,
+                    min: (dataRight & 0x0000FFFF) / 10000
                 }
             });
             break;
