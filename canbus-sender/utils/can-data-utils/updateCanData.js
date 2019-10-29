@@ -1,27 +1,50 @@
-function updateBmsHv(canData, firstByte, dataLeft, _dataRight, timestamp) {
-    // If none is received, create a new object
-    if (!(canData.receivedBmsHvVolt || canData.receivedBmsHvTemp)) {
-        canData.bmsHv.push({ timestamp });
-    }
-    // Gets the index of the last element
-    const last = this.bmsHv.length - 1;
-    // Switch on the first byte
+function updateBmsHv(canData, firstByte, dataLeft, dataRight, timestamp) {
     switch (firstByte) {
-        // volt
+        // voltage
         case 0x01:
-            canData.bms_hv[last].volt = dataLeft & 16777215;
-            canData.receivedBmsHvVolt = true;
+            canData.bms_hv.voltage.push({
+                timestamp,
+                value: {
+                    total: (dataLeft & 0x00FFFFFF) / 10_000,
+                    max: ((dataRight >> 16) & 0x0000FFFF) / 10_000,
+                    min: (dataRight & 0x0000FFFF) / 10_000
+                }
+            });
             break;
-            // temp
+        // temperature
         case 0x0A:
-            canData.bms_hv[last].temp = (dataLeft >> 8) & 65535;
-            canData.receivedBmsHvTemp = true;
+            canData.bms_hv.temperature.push({
+                timestamp,
+                value: {
+                    average: ((dataLeft >> 8) & 0x0000FFFF) / 100,
+                    max: (((dataLeft & 0x000000FF) * 256) + ((dataRight >> 32) & 0x000000FF)) / 100,
+                    min: ((dataRight >> 8) & 0x0000FFFF) / 100
+                }
+            });
             break;
-    }
-    // If both are received, make them false so that a new object will be created next time
-    if (canData.receivedBmsHvVolt && canData.receivedBmsHvTemp) {
-        canData.receivedBmsHvVolt = false;
-        canData.receivedBmsHvTemp = false;
+        // current
+        case 0x05:
+            canData.bms_hv.current.push({
+                timestamp,
+                value: {
+                    current: ((dataLeft >> 8) & 0x0000FFFF) / 10,
+                    pow: (((dataLeft & 0x000000FF) * 256) + ((dataRight >> 32) & 0x000000FF))
+                }
+            });
+            break;
+        // errors
+        case 0x08:
+            canData.bms_hv.errors.push({
+                timestamp,
+                code: (dataLeft >> 16) & 0x000000FF,
+                index: (dataLeft >> 8) & 0x000000FF,
+                value: (((dataLeft & 0x000000FF) * 256) + ((dataRight >> 32) & 0x000000FF))
+            });
+            break;
+        // warnings
+        case 0x09:
+            canData.bms_hv.current.push({ timestamp, value: (dataLeft >> 16) & 0x000000FF });
+            break;
     }
 }
 
@@ -31,7 +54,7 @@ function updatePedals(canData, firstByte, dataLeft, _dataRight, timestamp) {
         case 0x01:
             canData.throttle.push({ timestamp, value: ((dataLeft >> 16) & 255) });
             break;
-            // brake
+        // brake
         case 0x02:
             canData.brake.push({ timestamp, value: ((dataLeft >> 16) & 255) });
             break;
@@ -40,18 +63,21 @@ function updatePedals(canData, firstByte, dataLeft, _dataRight, timestamp) {
 
 function updateImuOrSwe(canData, firstByte, dataLeft, dataRight, timestamp) {
     switch (firstByte) {
-        // imu gyro
-        case 0x04:
-            canData.imu_gyro.push({
+        // imu gyro xy
+        case 0x03:
+            canData.imu_gyro.xy.push({
                 timestamp,
                 value: {
-                    x: ((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255),
-                    y: (dataLeft & 255) * 256 + ((dataLeft >> 24) & 255),
-                    z: ((dataRight >> 16) & 255) * 256 + ((dataRight >> 8) & 255)
+                    x: (dataLeft >> 8) & 0x0000FFFF,
+                    y: (dataRight >> 16) & 0x0000FFFF
                 }
             });
             break;
-            // imu axel
+        // imy gyro z
+        case 0x04:
+            canData.imu_gyro.z.push({ timestamp, value: ((dataLeft >> 8) & 0x0000FFFF) });
+            break;
+        // imu axel
         case 0x05:
             canData.imu_axel.push({
                 timestamp,
@@ -62,7 +88,7 @@ function updateImuOrSwe(canData, firstByte, dataLeft, dataRight, timestamp) {
                 }
             });
             break;
-            // steering wheel encoder
+        // steering wheel encoder
         case 0x02:
             canData.steering_wheel_encoder.push({ timestamp, value: ((dataLeft >> 16) & 255) });
             break;
@@ -70,59 +96,34 @@ function updateImuOrSwe(canData, firstByte, dataLeft, dataRight, timestamp) {
 }
 
 function updateGpsAndFrontWheelsEncoder(canData, firstByte, dataLeft, dataRight, timestamp) {
-
-    // If none is received, create a new object
-    function gpsNoneReceived() {
-        if (!(canData.receivedLatitude || canData.receivedLongitude)) {
-            canData.gps.push({ timestamp });
-        }
-    }
-
-    // If both are received, make them false so that a new object will be created next time
-    function gpsBothReceived() {
-        if (canData.receivedLatitude && canData.receivedLongitude) {
-            canData.receivedLatitude = false;
-            canData.receivedLongitude = false;
-        }
-    }
-
-    // Switch on the first byte
     switch (firstByte) {
         // latitude and speed
         case 0x01:
             {
-                // If none is received, create a new object
-                gpsNoneReceived();
-                // Gets the index of the last element
-                const last = canData.gps.length - 1;
-                // Updates the last element
-                canData[last].latitude = (((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255)) * 100000 + ((dataLeft & 255) * 256 + ((dataRight >> 24) & 255));
-                canData[last].lat_o = (dataRight >> 16) & 255;
-                canData[last].speed = (((dataRight >> 8) & 255) * 256) + (dataRight & 255);
-                // Set receivedLatitude to true
-                canData.receivedLatitude = true;
-                // If both are received, make them false so that a new object will be created next time
-                gpsBothReceived();
+                canData.gps.latspd.push({
+                    timestamp,
+                    value: {
+                        latitude: (((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255)) * 100000 + ((dataLeft & 255) * 256 + ((dataRight >> 24) & 255)),
+                        lat_o: (dataRight >> 16) & 255,
+                        speed: (((dataRight >> 8) & 255) * 256) + (dataRight & 255)
+                    }
+                });
                 break;
             }
-            // longitude and altitude
+        // longitude and altitude
         case 0x02:
             {
-                // If none is received, create a new object
-                gpsNoneReceived();
-                // Gets the index of the last element
-                const last = canData.gps.length - 1;
-                // Updates the last element
-                canData[last].longitude = (((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255)) * 100000 + ((dataLeft & 255) * 256 + ((dataRight >> 24) & 255));
-                canData[last].lon_o = (dataRight >> 16) & 255;
-                canData[last].altitude = (((dataRight >> 8) & 255) * 256) + (dataRight & 255);
-                // Set receivedLongitude to true
-                canData.receivedLongitude = true;
-                // If both are received, make them false so that a new object will be created next time
-                gpsBothReceived();
+                canData.gps.lonalt.push({
+                    timestamp,
+                    value: {
+                        longitude: (((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255)) * 100000 + ((dataLeft & 255) * 256 + ((dataRight >> 24) & 255)),
+                        lon_o: (dataRight >> 16) & 255,
+                        altitude: (((dataRight >> 8) & 255) * 256) + (dataRight & 255)
+                    }
+                });
                 break;
             }
-            // front wheels encoder
+        // front wheels encoder
         case 0x06:
             canData.front_wheels_encoder.push({ timestamp, value: ((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255) });
             break;
@@ -131,13 +132,10 @@ function updateGpsAndFrontWheelsEncoder(canData, firstByte, dataLeft, dataRight,
 }
 
 function updateBmsLv(canData, firstByte, dataLeft, dataRight, _timestamp) {
-    if (!canData.bms_lv.length) {
-        canData.bms_lv.push([]);
-    }
     switch (firstByte) {
         // temp
         case 0xFF:
-            canData.bms_lv[0].temp = ((dataLeft & 255) << 8) + ((dataRight >> 24) & 255);
+            canData.bms_lv.temperature.push({ timestamp, value: ((dataLeft & 255) << 8) + ((dataRight >> 24) & 255) });
             break;
     }
 }
@@ -156,23 +154,23 @@ module.exports = function updateCanData(canData, message, timestamp) {
         case (0XAA):
             updateBmsHv(canData, firstByte, dataLeft, dataRight, timestamp);
             break;
-            // Pedals
+        // Pedals
         case (0xB0):
             updatePedals(canData, firstByte, dataLeft, dataRight, timestamp);
             break;
-            // Imu and SteeringWheelEncoder
+        // Imu and SteeringWheelEncoder
         case (0xC0):
             updateImuOrSwe(canData, firstByte, dataLeft, dataRight, timestamp);
             break;
-            // Gps and FrontWheelsEncoder
+        // Gps and FrontWheelsEncoder
         case (0xD0):
             updateGpsAndFrontWheelsEncoder(canData, firstByte, dataLeft, dataRight, timestamp);
             break;
-            // BmsLv
+        // BmsLv
         case (0xFF):
             updateBmsLv(canData, firstByte, dataLeft, dataRight, timestamp);
             break;
-            // Marker
+        // Marker
         case (0xAB):
             canData.marker = true;
             // update data model...

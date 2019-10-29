@@ -1,17 +1,29 @@
 module.exports = function defaultCanData() {
     return {
-        bms_hv: [],
-        bms_lv: [],
-        gps: [],
-        imu_gyro: [],
+        bms_hv: {
+            temperature: [],
+            voltage: [],
+            current: [],
+            errors: [],
+            warnings: []
+        },
+        gps: {
+            latspd: [],
+            lonalt: []
+        },
+        imu_gyro: {
+            xy: [],
+            z: []
+        },
+        bms_lv: {
+            temperature: [],
+            voltage: [],
+            current: []
+        },
         imu_axel: [],
         front_wheels_encoder: [],
         steering_wheel_encoder: [],
         throttle: [],
-        brake: [],
-        receivedLatitude: false,
-        receivedLongitude: false,
-        receivedBmsHvVolt: false,
-        receivedBmsHvTemp: false
+        brake: []
     };
 };
