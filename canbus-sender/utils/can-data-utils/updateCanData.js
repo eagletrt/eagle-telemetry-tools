@@ -140,9 +140,18 @@ function updateBmsLv(canData, firstByte, dataLeft, dataRight, _timestamp) {
     }
 }
 
+function completeBytes(bytes) {
+    const missing = 8 - bytes.length;
+    for (let i = 0; i < missing; i++) {
+        bytes.push(0);
+    }
+}
+
 module.exports = function updateCanData(canData, message, timestamp) {
     // Gets message's bytes
     const bytes = message.data.toJSON().data;
+    // Complete bytes if they are not eight
+    completeBytes(bytes);
     // Left and right parts of the message
     const dataLeft = (bytes[0] << 24) + (bytes[1] << 16) + (bytes[2] << 8) + bytes[3];
     const dataRight = (bytes[4] << 24) + (bytes[5] << 16) + (bytes[6] << 8) + bytes[7];
