@@ -44,7 +44,7 @@ class Scheduler {
             log.debug('Updating can data');
             updateCanData(this.canData, message, timestamp);
         }
-        this.insertMatlab(message, timestamp);
+        this._insertMatlab(message, timestamp);
     }
 
     stop() {
