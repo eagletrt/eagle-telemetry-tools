@@ -15,9 +15,9 @@ class Database {
         log.log('Connecting to mongodb...');
         const uri = this._getUri();
         log.log('MongoDB: uri is ' + uri);
-        this.structuredCollection = `${this.config.collection.structured}-${(new Date()).toLocaleString().replace(/\s/g,'-')}`
+        this.structuredCollection = `${this.config.collections.structured}-${(new Date()).toLocaleString().replace(/\s/g,'-')}`
         log.log('MongoDB: structured collection is ' + this.structuredCollection);
-        this.matlabCollection = `${this.config.collection.matlab}-${(new Date()).toLocaleString().replace(/\s/g,'-')}`
+        this.matlabCollection = `${this.config.collections.matlab}-${(new Date()).toLocaleString().replace(/\s/g,'-')}`
         log.log('MongoDB: matlab collectoin is ' + this.matlabCollection);
         MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (error, database) => {
             if (error) {
