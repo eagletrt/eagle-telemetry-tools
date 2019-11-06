@@ -17,7 +17,7 @@ function updateBmsHv(canData, firstByte, dataLeft, dataRight, timestamp) {
                 timestamp,
                 value: {
                     average: ((dataLeft >> 8) & 0x0000FFFF) / 100,
-                    max: (((dataLeft & 0x000000FF) * 256) + ((dataRight >> 32) & 0x000000FF)) / 100,
+                    max: (((dataLeft & 0x000000FF) * 256) + ((dataRight >> 24) & 0x000000FF)) / 100,
                     min: ((dataRight >> 8) & 0x0000FFFF) / 100
                 }
             });
@@ -28,7 +28,7 @@ function updateBmsHv(canData, firstByte, dataLeft, dataRight, timestamp) {
                 timestamp,
                 value: {
                     current: ((dataLeft >> 8) & 0x0000FFFF) / 10,
-                    pow: (((dataLeft & 0x000000FF) * 256) + ((dataRight >> 32) & 0x000000FF))
+                    pow: (((dataLeft & 0x000000FF) * 256) + ((dataRight >> 24) & 0x000000FF))
                 }
             });
             break;
@@ -38,7 +38,7 @@ function updateBmsHv(canData, firstByte, dataLeft, dataRight, timestamp) {
                 timestamp,
                 code: (dataLeft >> 16) & 0x000000FF,
                 index: (dataLeft >> 8) & 0x000000FF,
-                value: (((dataLeft & 0x000000FF) * 256) + ((dataRight >> 32) & 0x000000FF))
+                value: (((dataLeft & 0x000000FF) * 256) + ((dataRight >> 24) & 0x000000FF))
             });
             break;
         // warnings
@@ -63,28 +63,25 @@ function updatePedals(canData, firstByte, dataLeft, _dataRight, timestamp) {
 
 function updateImuOrSwe(canData, firstByte, dataLeft, dataRight, timestamp) {
     switch (firstByte) {
-        // imu gyro xy
-        case 0x03:
-            canData.imu_gyro.xy.push({
-                timestamp,
-                value: {
-                    x: (dataLeft >> 8) & 0x0000FFFF,
-                    y: (dataRight >> 16) & 0x0000FFFF
-                }
-            });
-            break;
-        // imy gyro z
-        case 0x04:
-            canData.imu_gyro.z.push({ timestamp, value: ((dataLeft >> 8) & 0x0000FFFF) });
-            break;
         // imu axel
-        case 0x05:
+        case 0x00:
             canData.imu_axel.push({
                 timestamp,
                 value: {
-                    x: ((dataLeft >> 16) & 255) * 256 + ((dataLeft >> 8) & 255),
-                    y: (dataLeft & 255) * 256 + ((dataLeft >> 24) & 255),
-                    z: ((dataRight >> 16) & 255) * 256 + ((dataRight >> 8) & 255)
+                    x: (dataLeft >> 8) & 0x0000FFFF,
+                    y: ((dataLeft & 0x000000FF) * 256) + ((dataRight >> 24) & 0x000000FF),
+                    z: (dataRight >> 8) & 0x0000FFFF
+                }
+            });
+            break;
+        // imu gyro
+        case 0x01:
+            canData.imu_gyro.push({
+                timestamp,
+                value: {
+                    x: (dataLeft >> 8) & 0x0000FFFF,
+                    y: ((dataLeft & 0x000000FF) * 256) + ((dataRight >> 24) & 0x000000FF),
+                    z: (dataRight >> 8) & 0x0000FFFF
                 }
             });
             break;
@@ -131,12 +128,21 @@ function updateGpsAndFrontWheelsEncoder(canData, firstByte, dataLeft, dataRight,
 
 }
 
-function updateBmsLv(canData, firstByte, dataLeft, dataRight, _timestamp) {
-    switch (firstByte) {
-        // temp
-        case 0xFF:
-            canData.bms_lv.temperature.push({ timestamp, value: ((dataLeft & 255) << 8) + ((dataRight >> 24) & 255) });
-            break;
+function updateBmsLv(canData, _firstByte, dataLeft, dataRight, timestamp) {
+    canData.bms_lv.values.push({
+        timestamp,
+        value: {
+            voltage: ((dataLeft >> 24) & 0x000000FF) * 10,
+            temperature_avg: ((dataLeft >> 8) & 0x000000FF) * 5,
+            temprature_max: ((dataLeft & 0x000000FF) * 5)
+        }
+    });
+    const errorCode = (dataRight >> 24) & 0x000000FF;
+    if (errorCode !== 0) {
+        canData.bms_lv.errors.push({
+            timestamp,
+            code: errorCode
+        });
     }
 }
 

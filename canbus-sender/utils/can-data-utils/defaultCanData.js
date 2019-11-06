@@ -11,16 +11,12 @@ module.exports = function defaultCanData() {
             latspd: [],
             lonalt: []
         },
-        imu_gyro: {
-            xy: [],
-            z: []
-        },
         bms_lv: {
-            temperature: [],
-            voltage: [],
-            current: []
+            values: [],
+            errors: []
         },
         imu_axel: [],
+        imu_gyro: [],
         front_wheels_encoder: [],
         steering_wheel_encoder: [],
         throttle: [],
